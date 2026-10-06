@@ -862,7 +862,7 @@ mod tests {
     fn strings_concat_and_unknown_function_error() {
         let ok = compile(r#"fn main() { string s = "a" + "b"; print(s); }"#).unwrap();
         ok.run().unwrap();
-        let err = compile(r#"fn main() { nope(); }"#).unwrap_err();
+        let err = compile(r#"fn main() { nope(); }"#).err().unwrap();
         assert!(err.contains("unknown function"), "got: {err}");
     }
 
