@@ -1,0 +1,4 @@
+cargo:rerun-if-changed=native/spp_native.cpp
+cargo:rerun-if-changed=native/spp_native.h
+cargo:rustc-link-search=native=/workspace/target/debug/build/spp-845db641692f48a4/out
+cargo:rustc-link-lib=static=spp_native

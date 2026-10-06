@@ -30,6 +30,8 @@ pub fn run_program(program: &Program) -> Result<Value, String> {
     }
 }
 
+const MAX_CALL_DEPTH: usize = 512;
+
 pub struct Interpreter {
     functions: HashMap<String, Function>,
     classes: HashMap<String, Class>,
@@ -58,8 +60,11 @@ impl Interpreter {
         if function.params.len() != args.len() {
             return Err(format!("SPP runtime: function '{}' expects {} argument(s), got {}", function.name, function.params.len(), args.len()));
         }
+        if self.call_stack.len() >= MAX_CALL_DEPTH {
+            return Err(format!("SPP runtime: maximum call depth ({MAX_CALL_DEPTH}) exceeded — likely infinite recursion in '{}'", function.name));
+        }
         self.call_stack.push(function.name.clone());
-        self.scopes.push(HashMap::new());
+        self.scopes.push(HashMap::with_capacity(function.params.len().max(8)));
         if let Some(this) = this_value { self.scopes.last_mut().unwrap().insert("this".into(), this); }
         for (param, value) in function.params.iter().zip(args.into_iter()) {
             let value = coerce_value(value, &param.ty, &self.classes).map_err(|e| format!("SPP runtime: parameter '{}': {e}", param.name))?;
@@ -75,7 +80,7 @@ impl Interpreter {
     }
 
     fn exec_block(&mut self, statements: &[Stmt]) -> Result<Flow, String> {
-        self.scopes.push(HashMap::new());
+        self.scopes.push(HashMap::with_capacity(statements.len().min(32).max(4)));
         for statement in statements {
             let flow = self.exec_stmt(statement)?;
             match flow {
@@ -395,9 +400,21 @@ impl Interpreter {
 
     fn set_variable(&mut self, name: &str, value: Value) -> Result<(), String> {
         for scope in self.scopes.iter_mut().rev() {
-            if scope.contains_key(name) { scope.insert(name.to_string(), value); return Ok(()); }
+            if let Some(old) = scope.get(name) {
+                // Preserve the declared static type: an `int` variable may never
+                // silently become a float through assignment.
+                let declared = old.ty();
+                let value = if matches!(declared, Type::Any) {
+                    value
+                } else {
+                    coerce_value(value, &declared, &self.classes)
+                        .map_err(|e| format!("variable '{name}': {e}"))?
+                };
+                scope.insert(name.to_string(), value);
+                return Ok(());
+            }
         }
-        Err(self.runtime_error(&format!("unknown variable '{name}'")))
+        Err(self.runtime_error(&format!("unknown variable '{name}' — declare it with 'let', 'var', or a type first")))
     }
 
     fn runtime_error(&self, msg: &str) -> String {
@@ -474,7 +491,7 @@ fn compare_string(a: &str, b: &str, op: &BinaryOp) -> bool {
     match op { BinaryOp::Less => a < b, BinaryOp::LessEqual => a <= b, BinaryOp::Greater => a > b, BinaryOp::GreaterEqual => a >= b, _ => false }
 }
 
-fn Interpreter_binary_op(left: Value, op: &BinaryOp, right: Value) -> Result<Value, String> {
+fn interpreter_binary_op(left: Value, op: &BinaryOp, right: Value) -> Result<Value, String> {
     match op {
         BinaryOp::Add => binary_add(left, right),
         BinaryOp::Sub | BinaryOp::Mul | BinaryOp::Div | BinaryOp::Mod => binary_math(left, right, op.clone()),
@@ -486,16 +503,34 @@ fn Interpreter_binary_op(left: Value, op: &BinaryOp, right: Value) -> Result<Val
 }
 
 impl Interpreter {
-    fn binary_op(&self, left: Value, op: &BinaryOp, right: Value) -> Result<Value, String> { Interpreter_binary_op(left, op, right) }
+    fn binary_op(&self, left: Value, op: &BinaryOp, right: Value) -> Result<Value, String> { interpreter_binary_op(left, op, right) }
 }
 
 fn coerce_value(value: Value, ty: &Type, classes: &HashMap<String, Class>) -> Result<Value, String> {
     match ty {
         Type::Any => Ok(value),
-        Type::Int if matches!(value, Value::Int(_)) => Ok(value),
-        Type::Float if matches!(value, Value::Float(_) | Value::Int(_)) => match value { Value::Int(v) => Ok(Value::Float(v as f64)), _ => Ok(value) },
-        Type::Bool if matches!(value, Value::Bool(_)) => Ok(value),
-        Type::String if matches!(value, Value::String(_)) => Ok(value),
+        // Narrowing conversions are explicit and lossy-by-design: int <- float truncates,
+        // bool <- number follows truthiness, string <- anything uses Display.
+        Type::Int => match value {
+            Value::Int(_) => Ok(value),
+            Value::Float(v) => Ok(Value::Int(v as i64)),
+            Value::Bool(v) => Ok(Value::Int(i64::from(v))),
+            other => Err(format!("expected int, got {}", value_type_name(&other))),
+        },
+        Type::Float => match value {
+            Value::Float(_) => Ok(value),
+            Value::Int(v) => Ok(Value::Float(v as f64)),
+            other => Err(format!("expected float, got {}", value_type_name(&other))),
+        },
+        Type::Bool => match value {
+            Value::Bool(_) => Ok(value),
+            other => Ok(Value::Bool(other.is_truthy())),
+        },
+        Type::String => match value {
+            Value::String(_) => Ok(value),
+            Value::Null => Ok(Value::String("null".into())),
+            other => Ok(Value::String(other.to_string())),
+        },
         Type::Void => Ok(Value::Null),
         Type::Array(inner) => match value {
             Value::Array(values) => {
