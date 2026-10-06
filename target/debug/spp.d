@@ -1,0 +1,1 @@
+/workspace/target/debug/spp: /workspace/build.rs /workspace/native/spp_native.cpp /workspace/native/spp_native.h /workspace/src/ast.rs /workspace/src/lexer/mod.rs /workspace/src/main.rs /workspace/src/native.rs /workspace/src/parser/mod.rs /workspace/src/runtime/mod.rs /workspace/src/stdlib.rs /workspace/src/token.rs /workspace/src/value.rs /workspace/src/vm.rs

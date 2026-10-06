@@ -1,0 +1,1 @@
+{"rustc":5244445300240561903,"features":"","declared_features":"","target":0,"profile":0,"path":0,"deps":[[8199467405481655097,"build_script_build",false,16236223257478072286]],"local":[{"RerunIfChanged":{"output":"debug/build/spp-845db641692f48a4/output","paths":["native/spp_native.cpp","native/spp_native.h"]}}],"rustflags":[],"config":0,"compile_kind":0}
