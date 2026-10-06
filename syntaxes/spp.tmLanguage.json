@@ -1,0 +1,208 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "SPP",
+  "scopeName": "source.spp",
+  "patterns": [
+    {
+      "include": "#comments"
+    },
+    {
+      "include": "#strings"
+    },
+    {
+      "include": "#numbers"
+    },
+    {
+      "include": "#functions"
+    },
+    {
+      "include": "#classes"
+    },
+    {
+      "include": "#keywords"
+    },
+    {
+      "include": "#types"
+    },
+    {
+      "include": "#constants"
+    },
+    {
+      "include": "#modules"
+    },
+    {
+      "include": "#builtins"
+    },
+    {
+      "include": "#new"
+    },
+    {
+      "include": "#operators"
+    },
+    {
+      "include": "#function-calls"
+    }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.line.double-slash.spp",
+          "match": "//.*$"
+        },
+        {
+          "name": "comment.line.number-sign.spp",
+          "match": "#.*$"
+        },
+        {
+          "name": "comment.block.spp",
+          "begin": "/\\*",
+          "end": "\\*/"
+        }
+      ]
+    },
+    "strings": {
+      "patterns": [
+        {
+          "name": "string.quoted.double.spp",
+          "begin": "\"",
+          "end": "\"",
+          "patterns": [
+            {
+              "name": "constant.character.escape.spp",
+              "match": "\\\\."
+            }
+          ]
+        },
+        {
+          "name": "string.quoted.single.spp",
+          "begin": "'",
+          "end": "'",
+          "patterns": [
+            {
+              "name": "constant.character.escape.spp",
+              "match": "\\\\."
+            }
+          ]
+        }
+      ]
+    },
+    "numbers": {
+      "patterns": [
+        {
+          "name": "constant.numeric.float.spp",
+          "match": "\\b\\d+(?:\\.\\d+)(?:[eE][+-]?\\d+)?\\b"
+        },
+        {
+          "name": "constant.numeric.integer.spp",
+          "match": "\\b\\d+\\b"
+        }
+      ]
+    },
+    "functions": {
+      "patterns": [
+        {
+          "match": "\\b(fn|function)\\s+([A-Za-z_][A-Za-z0-9_]*)",
+          "captures": {
+            "1": {
+              "name": "storage.type.function.spp"
+            },
+            "2": {
+              "name": "entity.name.function.definition.spp"
+            }
+          }
+        }
+      ]
+    },
+    "classes": {
+      "patterns": [
+        {
+          "match": "\\b(class)\\s+([A-Za-z_][A-Za-z0-9_]*)",
+          "captures": {
+            "1": {
+              "name": "storage.type.class.spp"
+            },
+            "2": {
+              "name": "entity.name.type.class.spp"
+            }
+          }
+        }
+      ]
+    },
+    "keywords": {
+      "patterns": [
+        {
+          "name": "keyword.control.spp",
+          "match": "\\b(?:if|else|while|for|in|return|break|continue)\\b"
+        },
+        {
+          "name": "storage.modifier.spp",
+          "match": "\\b(?:new|this|let|var|package|import)\\b"
+        }
+      ]
+    },
+    "types": {
+      "patterns": [
+        {
+          "name": "storage.type.primitive.spp",
+          "match": "\\b(?:any|auto|int|integer|float|double|bool|boolean|string|str|void)\\b"
+        }
+      ]
+    },
+    "constants": {
+      "patterns": [
+        {
+          "name": "constant.language.spp",
+          "match": "\\b(?:true|false|null)\\b"
+        }
+      ]
+    },
+    "builtins": {
+      "patterns": [
+        {
+          "name": "support.function.builtin.spp",
+          "match": "\\b(?:print|println|write|len|range|push|pop|input|readLine|str|string|int|float|double|bool|typeOf|typeof|abs|sqrt|floor|ceil|min|max|time_ms|sleep_ms|assert|readFile|writeFile)\\b(?=\\s*\\()"
+        }
+      ]
+    },
+    "new": {
+      "patterns": [
+        {
+          "match": "\\b(new)\\s+([A-Za-z_][A-Za-z0-9_]*)",
+          "captures": {
+            "1": {
+              "name": "keyword.operator.new.spp"
+            },
+            "2": {
+              "name": "entity.name.type.class.spp"
+            }
+          }
+        }
+      ]
+    },
+    "function-calls": {
+      "patterns": [
+        {
+          "name": "entity.name.function.call.spp",
+          "match": "\\b[A-Za-z_][A-Za-z0-9_]*(?=\\s*\\()"
+        }
+      ]
+    },
+    "operators": {
+      "patterns": [
+        {
+          "name": "keyword.operator.spp",
+          "match": "(?:==|!=|<=|>=|&&|\\|\\||->|\\+=|-=|\\*=|/=|\\+\\+|--|[+*/%<>=!\\-])"
+        }
+      ]
+    },
+    "modules": {
+      "patterns": [
+        {
+          "name": "support.type.module.spp",
+          "match": "\\b(?:Math|math|Time|time|Random|random|Spp3D|spp3d|File|file|OS|os)\\b"
+        }
+      ]
+    }
+  }
+}

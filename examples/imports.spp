@@ -1,0 +1,21 @@
+import Math;
+import Time;
+import random;
+import Spp3D;
+import File;
+
+fn main() {
+    float radius = 4.0;
+    float area = Math.PI * Math.pow(radius, 2.0);
+    println("area = " + area);
+
+    println("timestamp = " + Time.now_ms());
+    println("random = " + random.int(1, 100));
+
+    float[] a = Spp3D.vec3(1.0, 2.0, 3.0);
+    float[] b = Spp3D.vec3(2.0, 4.0, 6.0);
+    println("distance = " + Spp3D.distance(a, b));
+
+    File.write("spp_import_test.txt", "SPP module test");
+    println(File.read("spp_import_test.txt"));
+}

@@ -1,0 +1,10 @@
+fn typed(int x, y: int) -> int {
+    return x + y;
+}
+
+fn main() {
+    int x = typed(20, 22,);
+    assert(x == 42);
+    int[] values = [1, 2, 3,];
+    assert(values.length == 3);
+}

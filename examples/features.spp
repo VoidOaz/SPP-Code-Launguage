@@ -1,0 +1,40 @@
+class Player {
+    string name;
+    int health = 100;
+
+    fn init(string name) {
+        this.name = name;
+    }
+
+    fn damage(int amount) {
+        this.health -= amount;
+    }
+}
+
+fn factorial(int n) -> int {
+    if (n <= 1) {
+        return 1;
+    }
+    return n * factorial(n - 1);
+}
+
+fn main() {
+    Player player = new Player("SPP");
+    player.damage(25);
+    print(player.name + " health=" + str(player.health));
+
+    int[] values = [2, 4, 6];
+    values.push(8);
+
+    int total = 0;
+    for (value in values) {
+        total += value;
+    }
+
+    print("total=" + str(total));
+    print("factorial=" + str(factorial(8)));
+
+    for (int i = 0; i < 3; i++) {
+        print(i);
+    }
+}

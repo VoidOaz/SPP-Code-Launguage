@@ -1,0 +1,11 @@
+{
+  "fonts": [],
+  "iconDefinitions": {
+    "_spp": {
+      "iconPath": "./logo/spp.svg"
+    }
+  },
+  "fileExtensions": {
+    "spp": "_spp"
+  }
+}

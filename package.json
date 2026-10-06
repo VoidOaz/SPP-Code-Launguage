@@ -1,0 +1,117 @@
+{
+  "name": "spp-language-support",
+  "displayName": "SPP Language Support",
+  "description": "Official VS Code support for SPP 2.0 Beta — Scriptable Performance Programming, with native Rust+C++ runtime tooling.",
+  "version": "2.0.0-beta.1",
+  "publisher": "spp-project",
+  "license": "SEE LICENSE IN LICENSE",
+  "preview": true,
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "keywords": [
+    "SPP",
+    "Scriptable Performance Programming",
+    "language",
+    "compiler",
+    "VM",
+    "Rust",
+    "C++"
+  ],
+  "main": "./extension.js",
+  "activationEvents": [
+    "onLanguage:spp",
+    "onCommand:spp.run",
+    "onCommand:spp.build",
+    "onCommand:spp.check",
+    "onCommand:spp.benchmark",
+    "onCommand:spp.terminal",
+    "onCommand:spp.verify"
+  ],
+  "files": [
+    "extension.js",
+    "package.json",
+    "language-configuration.json",
+    "spp-icon-theme.json",
+    "syntaxes/spp.tmLanguage.json",
+    "logo/spp.svg",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md",
+    "bin/spp.cmd",
+    "bin/spp.exe"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "spp",
+        "aliases": [
+          "SPP",
+          "spp"
+        ],
+        "extensions": [
+          ".spp"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "spp",
+        "scopeName": "source.spp",
+        "path": "./syntaxes/spp.tmLanguage.json"
+      }
+    ],
+    "iconThemes": [
+      {
+        "id": "spp-file-icons",
+        "label": "SPP File Icons",
+        "path": "./spp-icon-theme.json"
+      }
+    ],
+    "commands": [
+      {
+        "command": "spp.run",
+        "title": "SPP: Run Current File"
+      },
+      {
+        "command": "spp.check",
+        "title": "SPP: Check Current File"
+      },
+      {
+        "command": "spp.build",
+        "title": "SPP: Build Current File"
+      },
+      {
+        "command": "spp.benchmark",
+        "title": "SPP: Benchmark Current File"
+      },
+      {
+        "command": "spp.terminal",
+        "title": "SPP: Open SPP Terminal"
+      },
+      {
+        "command": "spp.verify",
+        "title": "SPP: Verify SPP Runtime"
+      }
+    ],
+    "configuration": {
+      "title": "SPP",
+      "properties": {
+        "spp.executablePath": {
+          "type": "string",
+          "default": "",
+          "description": "Optional path to a built SPP compiler. Empty uses the workspace release/debug binary, then PATH."
+        },
+        "spp.autoEnableFileIcons": {
+          "type": "boolean",
+          "default": true,
+          "description": "Reserved for future automatic icon-theme activation."
+        }
+      }
+    }
+  }
+}
