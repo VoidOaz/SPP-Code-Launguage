@@ -111,6 +111,20 @@ pub fn module_call(module: &str, member: &str, args: &[Value], monotonic_ms: i64
         ("math", "log") | ("math", "ln") => { expect(args, 1, "Math.log")?; Ok(Value::Float(number(&args[0], "Math.log")?.ln())) }
         ("math", "exp") => { expect(args, 1, "Math.exp")?; Ok(Value::Float(number(&args[0], "Math.exp")?.exp())) }
 
+        // Batch numerics dispatched to the native C++17 layer (SSE2-vectorized).
+        ("math", "sum") => {
+            expect(args, 1, "Math.sum")?;
+            let xs = number_array(&args[0], "Math.sum")?;
+            Ok(Value::Float(native::batch_sum(&xs)))
+        }
+        ("math", "dot") => {
+            expect(args, 2, "Math.dot")?;
+            let a = number_array(&args[0], "Math.dot")?;
+            let b = number_array(&args[1], "Math.dot")?;
+            native::batch_dot(&a, &b).ok_or_else(|| "SPP runtime: Math.dot expects equal-length arrays".to_string())
+                .map(Value::Float)
+        }
+
         ("time", "now") | ("time", "now_ms") | ("time", "unix_ms") => {
             expect(args, 0, "Time.now")?;
             let now = SystemTime::now().duration_since(UNIX_EPOCH).map_err(|e| e.to_string())?;
@@ -202,6 +216,22 @@ fn vector3(v: &Value, name: &str) -> Result<[f64; 3], String> {
             Ok([number(&values[0], name)?, number(&values[1], name)?, number(&values[2], name)?])
         }
         _ => Err(format!("SPP runtime: {name} expects a 3-component vector")),
+    }
+}
+
+/// Extract an array of numbers into a contiguous `Vec<f64>` so it can be
+/// handed to the native C++ batch routines in one FFI call.
+fn number_array(v: &Value, name: &str) -> Result<Vec<f64>, String> {
+    match v {
+        Value::Array(a) => {
+            let values = a.borrow();
+            let mut out = Vec::with_capacity(values.len());
+            for item in values.iter() {
+                out.push(number(item, name)?);
+            }
+            Ok(out)
+        }
+        _ => Err(format!("SPP runtime: {name} expects an array of numbers")),
     }
 }
 

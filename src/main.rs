@@ -38,7 +38,8 @@ fn usage() {
     println!("  spp modules                                List built-in modules");
     println!("  spp --version");
     println!();
-    println!("Engine: Rust compiler/runtime + C++17 native math FFI + optimized bytecode VM.");
+    println!("Engine: Rust runtime + C++17 native math (SSE2 batch ops) + C11 core (native hashing) + optimized bytecode VM.");
+    println!("Native ABI: v{}.", crate::native::native_version_string());
 }
 
 fn main() {
@@ -291,7 +292,7 @@ fn build_path_args(a: &str, b: Option<&str>) -> Result<(), String> {
 
 fn print_modules() {
     println!("SPP built-in modules:");
-    println!("  Math   — native numerical functions and constants");
+    println!("  Math   — native numerical functions, constants and SSE2 batch ops (sum/dot)");
     println!("  Time   — wall-clock and monotonic timing");
     println!("  Random — fast pseudo-random helpers");
     println!("  Spp3D  — native 3D vector/math primitives");
