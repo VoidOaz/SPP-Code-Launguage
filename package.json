@@ -6,6 +6,7 @@
   "publisher": "spp-project",
   "license": "SEE LICENSE IN LICENSE",
   "preview": true,
+  "icon": "logo/spp-marketplace.png",
   "engines": {
     "vscode": "^1.90.0"
   },
@@ -38,11 +39,12 @@
     "spp-icon-theme.json",
     "syntaxes/spp.tmLanguage.json",
     "logo/spp.svg",
+    "logo/spp-marketplace.png",
     "README.md",
     "LICENSE",
     "CHANGELOG.md",
-    "bin/spp.cmd",
-    "bin/spp.exe"
+    "bin/spp",
+    "bin/spp.cmd"
   ],
   "contributes": {
     "languages": [
